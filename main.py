@@ -1,6 +1,6 @@
 class Dominoes:
     def __init__(self, players, bones):
-        self.players = 2
+        self.players = 2 # Number of player
         self.bones = 28
     
     def draw(self):
