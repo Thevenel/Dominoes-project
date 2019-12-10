@@ -94,12 +94,15 @@ class Players:
     def get_pile(self):
         return self.pile
 
-    def get_passess(self):
+    def get_passes(self):
         return self.passes
 
 
 class Robot(Players):
     def player_turn(self, chain):
+        print("It's " + self.name + "'s turn !\nThe tiles are:")
+        for i in range(len(self.pile)): # print all tiles
+            print(str(i+1) + ") " + str(self.pile[i]))
 
         canPlay = False
         for tile in self.pile:
@@ -136,17 +139,17 @@ def start_game():
     random.shuffle(completed_pile)
 
 # create the players
-    
+    c4 = Robot("Bot4")
     c1 = Robot("Bot1")
     c2 = Robot("Bot2")
     c3 = Robot("Bot3")
-    c4 = Robot("Bot4")
+    
 
     # deal the game 
     input("Enter to start the game")
     player_list = [c1, c2, c3, c4]
-    for player in player_list:
-        for i in range(7):
+    for player in player_list: #give each player 7 tiles to start the game
+        for i in range(7): 
             player.pile.append(completed_pile.pop())
 
 
@@ -183,7 +186,34 @@ def start_game():
 
         chain = game_train[player_number].player_turn(chain)
         player_number = (player_number + 1) % 4
+        
 
         # print(current_player)
+
+    #Games Over phase
+    #There is two ways the domino can close 
+    # When a pile is empty and when everyone is passed
+    #The winner by emptying pile
+        if len(game_train[player_number].get_pile()) == 0: 
+            print(game_train[player_number].get_name() + " played their final domino! \n" + \
+            game_train[player_number].name + " wins!")
+            
+            
+
+        #Win by block
+        number_of_passes = 0
+        for plaer in game_train:
+            if player.get_passes()>= 1:
+                number_of_passes += 1
+
+        if number_of_passes == 4:
+            print("No one has playable dominoes. The last player to play a domino was " +\
+            (game_train[player_number].get_name() + "."))
+            print(game_train[player_number].get_name() + " wins!")
+            
+
+        
+        
+
 
 start_game()
