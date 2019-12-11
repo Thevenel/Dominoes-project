@@ -1,137 +1,13 @@
 import random # To use later for a random shuffle
-class Dominoes:
-
-    def __init__(self, phase1, phase2):
-        self.phase1 = phase1
-        self.phase2 = phase2
-    
-    def __str__(self):
-        return "{}|{}".format(self.phase1, self.phase2)
-    
-    def matchL(self, o):
-        return self.phase1 == o.phase1 or self.phase2 == o.phase1
-
-    def matchR(self, o):
-        return self.phase1 == o.phase2 or self.phase2 == o.phase2
-
-    def __eq__(self, o):
-        if self.phase1 == o.phase1 and self.phase2 == o.phase2:
-            return True
-        elif self.phase1 == o.phase2 and self.phase2 == o.phase1:
-            return True
-        else:
-            return False
+# import the classes for classes.py
+from classes import Dominoes
+from classes import Players
+from classes import Robot
         
-class Players:
-    def __init__(self, name):
-        self.name = name
-        self.pile = []
-        self.passes = 0
-
-    def __str__(self):
-        string = self.name
-        for tile in self.pile:
-            string += tile
-            string += '\n'
-        return string
-
-# Initialize the chain with add_left and add_right methods
-    def add_left(self, chain, tile):
-        if tile.phase2 == chain[0].phase1:
-            chain.insert(0, tile)
-            self.pile.remove(tile)
-        elif tile.phase1 == chain[0].phase1:
-            a = tile.phase1
-            b = tile.phase2
-            tile.phase1 = b
-            tile.phase2 = a
-            chain.insert(0, tile)
-            self.pile.remove(tile)
-        return chain
-    
-    def add_right(self, chain, tile):
-        if tile.phase1 == chain[len(chain)-1].phase2:
-            chain.append(tile)
-            self.pile.remove(tile)
-        elif tile.phase2 == chain[len(chain)-1].phase2:
-            a = tile.phase1
-            b = tile.phase2
-            tile.phase1 = b
-            tile.phase2 = a
-            chain.append(tile)
-            self.pile.remove(tile)
-        return chain
-
-    def player_turn(self, chain):
-        for i in range(len(self.pile)): # print all tiles
-                print(str(i + 1) + ") " + str(self.pile[i]))
-    
-        canPlay = False
-        for tile in self.pile:
-            if tile.matchL(chain[0]) or tile.matchR(chain[len(chain)-1]):
-                canPlay = True
-        if canPlay == False:
-            self.passes += 1
-            return chain
-        
-        elif canPlay == True:
-                self.passes = 0
-                for tile in self.pile:
-                    if tile.matchL(chain[0]):
-                        print(tile)
-                        chain = self.add_left(chain, tile)
-                        input("press enter to continue")
-                        return chain
-                    elif tile.matchR(chain[len(chain)-1]):
-                        print(tile)
-                        chain = self.add_right(chain, tile)
-                        input("press input to continue") 
-                        return chain
-    
-    def get_name(self):
-        return self.name
-
-    def get_pile(self):
-        return self.pile
-
-    def get_passes(self):
-        return self.passes
-
-
-class Robot(Players):
-    def player_turn(self, chain):
-        print("It's " + self.name + "'s turn !\nThe tiles are:")
-        for i in range(len(self.pile)): # print all tiles
-            print(str(i+1) + ") " + str(self.pile[i]))
-
-        canPlay = False
-        for tile in self.pile:
-            if tile.matchL(chain[0]) or tile.matchR(chain[len(chain)-1]):
-                canPlay = True
-        if canPlay == False:
-            print(self.name + ' has no playable dominoes.')
-            self.passes +=1
-            input("press enter to continue")
-            return chain
-
-        elif canPlay == True:
-            self.passes = 0
-            for tile in self.pile:
-                if tile.matchL(chain[0]):
-                    print(tile)
-                    chain = self.add_left(chain, tile)
-                    input("press enter to continue")
-                    return chain
-                elif tile.matchR(chain[len(chain)-1]):
-                    print(tile)
-                    chain = self.add_right(chain, tile)
-                    input("press enter to continue")
-                    return chain
-    
 def start_game():
     chain = [] # tiles of the chain
     completed_pile = [] # all the tiles
-    # extra_tiles = [] # reserved piles
+    extra_tiles = [] # reserved piles
     
     for n in range(7): # add the tiles to completed_pile
         for i in range(0, n+1):
@@ -144,7 +20,6 @@ def start_game():
     c2 = Robot("Bot2")
     c3 = Robot("Bot3")
     
-
     # deal the game 
     input("Enter to start the game")
     player_list = [c1, c2, c3, c4]
@@ -166,7 +41,7 @@ def start_game():
     random.shuffle(player_list)
     for player in player_list:
         game_train.append(player)
-
+        
     game_oder = "The game order is: "
     for player in game_train:
         game_oder += player.name
@@ -183,37 +58,58 @@ def start_game():
             print(str(tile) + " ", end="")
         print('\n')
 
-
         chain = game_train[player_number].player_turn(chain)
-        player_number = (player_number + 1) % 4
-        
-
-        # print(current_player)
+        # print('this =>', chain)
 
     #Games Over phase
     #There is two ways the domino can close 
     # When a pile is empty and when everyone is passed
     #The winner by emptying pile
         if len(game_train[player_number].get_pile()) == 0: 
+            total_dots = 168
+            points = 0
+            for tile in chain:
+                c = (str(tile))
+                d = eval(c.replace("|", "+"))
+                points  += d
+                result = total_dots - points
             print(game_train[player_number].get_name() + " played their final domino! \n" + \
-            game_train[player_number].name + " wins!")
-            
-            
+            game_train[player_number].name + " wins! with " + str(result) + " points")
+            break
 
         #Win by block
         number_of_passes = 0
-        for plaer in game_train:
+        for player in game_train:
             if player.get_passes()>= 1:
                 number_of_passes += 1
-
+        
         if number_of_passes == 4:
             print("No one has playable dominoes. The last player to play a domino was " +\
             (game_train[player_number].get_name() + "."))
-            print(game_train[player_number].get_name() + " wins!")
-            
+            # print(number_of_points)
+            total_dots = 168
+            points = 0
+            for tile in chain:
+                c = (str(tile))
+                d = eval(c.replace("|", "+"))
+                points  += d
+                result = total_dots - points
+            print(game_train[player_number].get_name() + " wins! with " + str(result) + " points")
+            break
+
+        player_number = (player_number + 1) % 4
+        
 
         
-        
-
-
 start_game()
+
+
+
+
+
+
+
+
+
+
+
